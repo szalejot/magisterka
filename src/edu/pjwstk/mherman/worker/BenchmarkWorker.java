@@ -7,16 +7,24 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.mysql.jdbc.jdbc2.optional.PreparedStatementWrapper;
+
+import edu.pjwstk.mherman.util.Configuration;
+
 public class BenchmarkWorker implements Runnable{
 
     private Connection connect = null;
     private PreparedStatement preparedStatement = null;
     private ResultSet resultSet = null;
     private List<Double> resultList;
+    private Configuration conf;
+    List< List<Integer> > params;
     Boolean initialized = false;
  
-    public BenchmarkWorker(List<Double> resultList) {
+    public BenchmarkWorker(Configuration configuration, List< List<Integer> > params, List<Double> resultList) {
         this.resultList = resultList;
+        this.conf = configuration;
+        this.params = params;
     }
     
     public void init() {
@@ -24,8 +32,8 @@ public class BenchmarkWorker implements Runnable{
             // This will load the MySQL driver, each DB has its own driver
             Class.forName("com.mysql.jdbc.Driver");
             // Setup the connection with the DB
-            connect = DriverManager.getConnection("jdbc:mysql://localhost:12345/clusterdb?"
-                    + "user=root");
+            connect = DriverManager.getConnection("jdbc:mysql://" + conf.getHost() + ":" + conf.getPort() + "/"
+                    + conf.getDbName() + "?" + "user=" + conf.getUser());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -43,16 +51,18 @@ public class BenchmarkWorker implements Runnable{
 
     private void benchmark() {
         try {
-            preparedStatement = connect.prepareStatement("SELECT * FROM simples WHERE id > ?");
+            preparedStatement = connect.prepareStatement(conf.getStatementTemplate());
         } catch (SQLException e) {
             e.printStackTrace();
         }
         int invokedCommands = 0;
         long startTime = System.currentTimeMillis();
         
-        for (int i = 0; i < 128; i++) {
+        for (int i = 0; i < params.size(); i++) {
             try {
-                preparedStatement.setInt(1, i);
+                for (int j = 0; j < params.get(i).size(); j++) {
+                    preparedStatement.setInt(j+1, params.get(i).get(j));
+                }
                 resultSet = preparedStatement.executeQuery();
             } catch (SQLException e) {
                 e.printStackTrace();

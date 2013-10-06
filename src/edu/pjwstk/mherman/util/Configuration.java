@@ -5,6 +5,7 @@ import java.util.List;
 
 public class Configuration {
 
+	private String comment;
     private String host;
     private String port;
     private String dbName;
@@ -13,7 +14,15 @@ public class Configuration {
     private String statementTemplate;
     private List<List<Integer>> parametersForThreads = new ArrayList<List<Integer>>();
 
-    public String getHost() {
+    public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+
+	public String getHost() {
         return host;
     }
 

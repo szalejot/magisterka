@@ -53,6 +53,7 @@ public class MainClass {
         DecimalFormat df = new DecimalFormat("#.##");
         System.out.println("Average value returned from worker = " + df.format(result) + "ms");
         System.out.println("Total benchmark time: " + makePrettyTime(elapsedTime));
+        System.out.println("Test comment: " + conf.getComment());
     }
     
     private static String makePrettyTime(Long milis) {

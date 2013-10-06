@@ -14,6 +14,7 @@ public class ConfigurationReader {
         Configuration conf = new Configuration();
         Map<String, String> paramMap = generateParamMap(fileName);
         
+        conf.setComment(paramMap.get("comment"));
         conf.setHost(paramMap.get("host"));
         conf.setPort(paramMap.get("port"));
         conf.setDbName(paramMap.get("dbName"));
